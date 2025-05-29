@@ -27,15 +27,10 @@
 
 ## Explicacion codigo
 
-server.js es la porcion de codigo que inicializa express, la base de datos y socket.io
-tecnicamente es la base del backend, al iniciar carga un frontend basico que demuestra las
-funcionalidades de la API REST al momento de ingresar datos, actualizarlos, seleccionarlos y
-Eliminarlos.
+server.js es la parte del código que inicializa Express, la base de datos y Socket.IO. Técnicamente, constituye la base del backend. Al iniciarse, carga un frontend básico que demuestra las funcionalidades de la API REST, permitiendo ingresar, actualizar, seleccionar y eliminar datos.
 
-Decidi separar la api en rutas que es contactado desde el server.js, la api "v1" como le llame
-redirige a routes.js el cual es el centro de redireccion para tasks.js, ademas de usarlo como
-redireccionador tome este metodo ya que quise ejemplificar una metodologia escalable, pero en este caso solo redirecciona la api a "tasks.js" que es el que tiene las funciones basicas de la API.
+Decidí separar la API en rutas que se gestionan desde server.js. La API, a la que denominé "v1", redirige a routes.js, que actúa como el centro de redirección hacia tasks.js. Opté por este método para ejemplificar una metodología escalable. En este caso, routes.js solo redirige la API a tasks.js, donde se encuentran las funciones básicas de la API.
 
-en tasks.js tenemos las funciones principales descritas en la seccion "Pruebas de la API", la cual tiene una funcion POST para crear las tareas validando que ningun campo este vacio o se pase del limite de caracteres, tenemos un metodo GET para obtener los valores que estan actualmente guardados en la tabla y ademas poblar nuestra tabla del front end, un metodo PUT para actualizar el estado de la tarea y por ultimo un DELETE para eliminar la tarea o mejor dicho la columna en la base de datos.
+En tasks.js se implementan las funciones principales descritas en la sección "Pruebas de la API". Incluye un método POST para crear tareas, validando que ningún campo esté vacío o exceda el límite de caracteres; un método GET para obtener los datos almacenados en la tabla y poblar la tabla del frontend; un método PUT para actualizar el estado de una tarea; y un método DELETE para eliminar una tarea, es decir, la correspondiente columna en la base de datos.
 
-Añadi tests antes de programar el front end para probar las funcionalidades al momento de realizarlas.
+Antes de desarrollar el frontend, añadí pruebas para verificar las funcionalidades al implementarlas.
