@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tareas</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Tareas</h1>
+    <form id="taskForm">
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required maxlength="100">
+        <br>
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" name="descripcion" maxlength="500"></textarea>
+        <br>
+        <button type="submit">Crear Tarea</button>
+    </form>
+    <h2>Tareas Existentes</h2>
+    <table id="tasksTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Fecha Creación</th>
+                <th>Fecha Actualización</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        
+        const socket = io('http://localhost:3000');
+
+        // Función para cargar tareas desde el servidor
+        function loadTasks() {
+            fetch('/v1/tasks')
+                .then(response => response.json())
+                .then(tasks => {
+                    const tbody = document.querySelector('#tasksTable tbody');
+                    tbody.innerHTML = '';
+                    tasks.forEach(task => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${task.id}</td>
+                            <td>${task.titulo}</td>
+                            <td>${task.descripcion}</td>
+                            <td>${task.status}</td>
+                            <td>${new Date(task.fechaCreacion).toLocaleString()}</td>
+                            <td>${new Date(task.fechaActualizacion).toLocaleString()}</td>
+                            <td>
+                                <button onclick="updateTaskStatus(${task.id}, 'completada')">Completar</button>
+                                <button onclick="deleteTask(${task.id})">Eliminar</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error al cargar las tareas:', error));
+        }
+
+        // Cargar tareas al iniciar la página
+        loadTasks();
+
+        // Crear una nueva tarea
+        document.getElementById('taskForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const titulo = document.getElementById('titulo').value;
+            const descripcion = document.getElementById('descripcion').value;
+            fetch('/v1/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ titulo, descripcion })
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('titulo').value = '';
+                    document.getElementById('descripcion').value = '';
+                    window.location.reload();
+                } else {
+                    alert('Error al crear la tarea');
+                }
+            })
+            .catch(error => {
+                console.error('Error al crear la tarea:', error);
+                alert('Error al crear la tarea');
+            });
+        });
+
+        // Actualizar el estado de una tarea a "completada"
+        function updateTaskStatus(id, status) {
+            fetch(`/v1/tasks/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error al actualizar la tarea');
+                }
+            })
+            .catch(error => {
+                console.error('Error al actualizar la tarea:', error);
+                alert('Error al actualizar la tarea');
+            });
+        }
+
+        // Eliminar una tarea
+        function deleteTask(id) {
+            if (confirm('¿Estás seguro de eliminar esta tarea?')) {
+                fetch(`/v1/tasks/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Error al eliminar la tarea');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al eliminar la tarea:', error);
+                    alert('Error al eliminar la tarea');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
